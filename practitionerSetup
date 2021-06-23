@@ -1,0 +1,91 @@
+String providerName = 'Clegane Clinic';
+String contactFirstName = 'Gregor';
+String contactLastName = 'Clegane';
+String healthcareFacilityNetworkName = 'London Network 1';
+String payerAccountId = '0014J00000BDsPsQAL';
+String healthcarePayerNetworkId = '0bf4J00000000CPQAY'; //Gold Network Comprehensive
+String panelStatus = 'Panel Open';
+String careSpecialityMRI = '0bc4J0000000102QAA';
+String careSpecialityPathology = '0bc4J0000000107QAA';
+String contactIndividualRecordTypeId = '0124J0000003zseQAA';
+
+
+Account acc = new Account();
+	acc.Name = providerName + '(Account name)';
+    acc.ShippingStreet = '67 Lansdowne Rd';
+    acc.ShippingCity = 'Bournemouth';
+    acc.ShippingCountry = 'United Kingdom';
+    acc.ShippingPostalCode = 'BH1 1RW';
+    acc.Type = 'Customer - Direct'; //Add this picklist value in setup > Object manager
+    acc.Industry = 'Healthcare';
+    acc.Phone = '020 8466 2810';
+Insert acc;
+
+/***************************************/
+Contact contact = new Contact();
+	contact.AccountId = acc.id;
+	contact.LastName = contactLastName;
+	contact.FirstName = contactFirstName;
+    //Individual record typeID
+	contact.RecordTypeId =contactIndividualRecordTypeId;
+    contact.Phone = '07824654419';
+Insert contact;
+
+/***************************************/
+HealthcareProvider hcProvider = new HealthcareProvider();
+	hcProvider.Name = contactFirstName + contactLastName + '(HealthcareProvider Name)';
+	hcProvider.PractitionerId = contact.id;
+	hcProvider.ProviderType = 'Medical Doctor';
+    hcProvider.ProviderClass = 'Medical Group';
+Insert hcProvider;
+
+/***************************************/
+HealthcareProviderNpi hcProviderNpi = New HealthcareProviderNpi();
+	hcProviderNpi.Name = providerName + 'HealthcareProviderNpi Name';
+	hcProviderNpi.Npi = '1234567101';
+	hcProviderNpi.PractitionerId = contact.id;
+	hcProviderNpi.NpiType = 'Individual';
+	hcProviderNpi.IsActive = true;
+Insert hcProviderNpi;
+
+/***************************************/
+//This object links practitioner with facility
+HealthcarePractitionerFacility healthcarePractitionerFacility = new HealthcarePractitionerFacility();
+	healthcarePractitionerFacility.Name = contactFirstName + contactLastName + 'at' + providerName + '(healthcarePractitionerFacility name)';
+	healthcarePractitionerFacility.IsActive=true;
+	healthcarePractitionerFacility.PractitionerId = contact.id;
+    healthcarePractitionerFacility.AccountId = acc.id;
+Insert healthcarePractitionerFacility;
+
+/***************************************/
+// 3 objects to keep in mind here:
+// HealthcareFacilityNetwork (Eg: Network 2) - This object links PayerNetworkId, PractitionerFacilityId and PractitionerId
+// HealthcarePayerNetwork (Eg: Gold Network) - This object links NetworkType (Eg: Comprehensive, Medium, Basic) and PayerId
+// Payer(Account -> Recordtype = payer) Eg: London healthcare
+
+HealthcareFacilityNetwork healthcareFacilityNetwork = new HealthcareFacilityNetwork();
+    healthcareFacilityNetwork.IsActive = true;
+    healthcareFacilityNetwork.Name = healthcareFacilityNetworkName;
+    healthcareFacilityNetwork.PanelStatus = panelStatus; //Accepts new patients
+    healthcareFacilityNetwork.PayerNetworkId = healthcarePayerNetworkId;
+    healthcareFacilityNetwork.PractitionerFacilityId = healthcarePractitionerFacility.id;
+    healthcareFacilityNetwork.PractitionerId = contact.id;
+Insert healthcareFacilityNetwork;
+
+/***************************************/
+//This object links Practitioner with Speciality
+//MRI
+CareProviderFacilitySpecialty careProviderFacilitySpecialty = new CareProviderFacilitySpecialty();
+	careProviderFacilitySpecialty.Name = contactFirstName + contactLastName + 'at' + providerName + 'Specialty1';
+	careProviderFacilitySpecialty.IsActive = true;
+	careProviderFacilitySpecialty.PractitionerFacilityId = healthcarePractitionerFacility.id;
+	careProviderFacilitySpecialty.SpecialtyId = careSpecialityMRI;
+Insert careProviderFacilitySpecialty;
+
+//PATHOLOGY
+CareProviderFacilitySpecialty careProviderFacilitySpecialty1 = new CareProviderFacilitySpecialty();
+	careProviderFacilitySpecialty1.Name = contactFirstName + contactLastName + 'at' + providerName + 'Specialty2';
+	careProviderFacilitySpecialty1.IsActive = true;
+	careProviderFacilitySpecialty1.PractitionerFacilityId = healthcarePractitionerFacility.id;
+	careProviderFacilitySpecialty1.SpecialtyId = careSpecialityPathology;
+Insert careProviderFacilitySpecialty1;
