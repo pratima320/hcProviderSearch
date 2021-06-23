@@ -1,0 +1,37 @@
+String providerName = 'Fordcombe Hospital';
+String careSpecialityMRI = '0bc4J0000000102QAA';
+String careSpecialityPathology = '0bc4J0000000107QAA';
+
+Account acc = new Account();
+acc.Name = providerName + '(Account name)';
+acc.Industry = 'Healthcare';
+acc.ShippingStreet = 'Fordcombe';
+acc.ShippingCity = 'Tunbridge Wells';
+acc.ShippingPostalCode = 'TN3 0RL';
+acc.ShippingCountry = 'United Kingdom';
+acc.Phone = '020 0466 2800';
+Insert acc;
+
+HealthcareProvider hcProvider = new HealthcareProvider();
+hcProvider.Name = providerName;
+hcProvider.AccountId = acc.id;
+hcProvider.ProviderType = 'Hospital';
+hcProvider.ProviderClass = 'Medical Group';
+Insert hcProvider;
+
+
+//MRI
+CareProviderFacilitySpecialty careProviderFacilitySpecialty = new CareProviderFacilitySpecialty();
+careProviderFacilitySpecialty.Name = providerName;
+careProviderFacilitySpecialty.IsActive = true;
+careProviderFacilitySpecialty.AccountId = acc.id;
+careProviderFacilitySpecialty.SpecialtyId = careSpecialityMRI;
+Insert careProviderFacilitySpecialty;
+
+//Pathology
+CareProviderFacilitySpecialty careProviderFacilitySpecialty1 = new CareProviderFacilitySpecialty();
+careProviderFacilitySpecialty1.Name = providerName;
+careProviderFacilitySpecialty1.IsActive = true;
+careProviderFacilitySpecialty1.AccountId = acc.id;
+careProviderFacilitySpecialty1.SpecialtyId = careSpecialityPathology;
+Insert careProviderFacilitySpecialty1;
